@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Story in the Stars 🌍</title>
+
+<style>
+body {
+    margin: 0;
+    background: black;
+    color: white;
+    font-family: Poppins, sans-serif;
+    overflow: hidden;
+}
+
+/* STAR BACKGROUND */
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
+
+/* 🌍 EARTH */
+#earth {
+    position: fixed;
+    bottom: 20px;
+    right: 30px;
+    width: 200px;
+    z-index: 1;
+    animation: spin 20s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ☄️ ASTEROID */
+#asteroid {
+    position: fixed;
+    top: -300px;
+    width: 220px;
+    display: none;
+    z-index: 2;
+}
+
+/* 🦸 SUPERHERO */
+#hero {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 350px;
+    display: none;
+    z-index: 3;
+    animation: heroFloat 2.5s infinite ease-in-out;
+}
+
+@keyframes heroFloat {
+    0% { transform: translate(-50%,0); }
+    50% { transform: translate(-50%,-15px); }
+    100% { transform: translate(-50%,0); }
+}
+
+/* STORY BOX */
+.story {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    max-width: 650px;
+    padding: 30px;
+    z-index: 5;
+}
+
+h1 {
+    font-size: 28px;
+    min-height: 60px;
+}
+
+/* FLOATING TEXT */
+.floatText {
+    animation: floatText 2.5s infinite ease-in-out;
+}
+
+@keyframes floatText {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+    100% { transform: translateY(0); }
+}
+
+/* BUTTONS */
+.buttons {
+    margin-top: 20px;
+    display: none;
+    gap: 25px;
+    justify-content: center;
+    animation: floatButtons 3s infinite ease-in-out;
+}
+
+@keyframes floatButtons {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0); }
+}
+
+button {
+    padding: 14px 32px;
+    font-size: 18px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+}
+
+#yesBtn {
+    background: #ff4d6d;
+    color: white;
+}
+
+#noBtn {
+    background: gray;
+    color: white;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+    h1 { font-size: 20px; }
+    #earth { width: 140px; }
+    #asteroid { width: 160px; }
+    #hero { width: 230px; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- 🎵 MUSIC -->
+<audio id="music1" loop>
+  <source src="music1.mp3">
+</audio>
+
+<audio id="music2" loop>
+  <source src="music2.mp3">
+</audio>
+
+<canvas id="stars"></canvas>
+
+<img id="earth" src="earth.png">
+<img id="asteroid" src="asteroid.png">
+<img id="hero" src="hero.png">
+
+<div class="story">
+    <h1 id="text"></h1>
+
+    <div class="buttons" id="buttons">
+        <button id="yesBtn">Yes 💖</button>
+        <button id="noBtn">No 🌌</button>
+    </div>
+</div>
+
+<script>
+/* ⭐ STAR BACKGROUND */
+const canvas = document.getElementById("stars");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+window.onresize = () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+};
+
+let stars = [];
+for(let i=0;i<300;i++){
+  stars.push({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    r: Math.random()*2
+  });
+}
+
+function drawStars(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="white";
+  stars.forEach(s=>{
+    ctx.beginPath();
+    ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+drawStars();
+
+/* 🎵 MUSIC CONTROL */
+const music1 = document.getElementById("music1");
+const music2 = document.getElementById("music2");
+
+/* Start first music on first click (browser autoplay rules) */
+document.body.addEventListener("click", ()=>{
+    if(music1.paused){
+        music1.play().catch(()=>{});
+    }
+},{once:true});
+
+/* 📖 STORY TEXT */
+const textEl = document.getElementById("text");
+const buttons = document.getElementById("buttons");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+
+let story = [
+"Hey bbg...",
+"I still remember when i first fell in love with you ✨",
+"I still remember when i first started talking to you",
+"You became my favorite person.",
+"And tonight, the universe wanted me to ask you something...(Life or death choose properly)"
+];
+
+let index = 0;
+let char = 0;
+
+function typeStory(){
+  if(index < story.length){
+    if(char < story[index].length){
+      textEl.innerHTML += story[index][char];
+      char++;
+      setTimeout(typeStory, 40);
+    } else {
+      setTimeout(()=>{
+        textEl.innerHTML = "";
+        char = 0;
+        index++;
+        typeStory();
+      }, 1500);
+    }
+  } else {
+    showProposal();
+  }
+}
+typeStory();
+
+/* FINAL QUESTION */
+function showProposal(){
+  textEl.innerHTML = "Will you be my forever, bujji? 💍";
+  textEl.classList.add("floatText"); // FLOAT QUESTION TOO
+  buttons.style.display = "flex";
+}
+
+/* ☄️ NO → ASTEROID FALLS */
+const asteroid = document.getElementById("asteroid");
+const earth = document.getElementById("earth");
+
+noBtn.addEventListener("click", ()=>{
+  asteroid.style.display = "block";
+
+  const earthPos = earth.getBoundingClientRect();
+  asteroid.style.left = earthPos.left + "px";
+
+  let y = -300;
+  const fall = setInterval(()=>{
+    y += 12;
+    asteroid.style.top = y + "px";
+
+    if(y > earthPos.top - 50){
+      clearInterval(fall);
+      earth.style.transform = "scale(0)";
+      textEl.innerHTML = "THE EARTH IS DESTROYED 😭";
+    }
+  },30);
+});
+
+/* 🦸 YES → SUPERHERO SAVES EARTH */
+const hero = document.getElementById("hero");
+
+yesBtn.addEventListener("click", ()=>{
+  /* Switch Music */
+  music1.pause();
+  music2.play();
+
+  buttons.style.display="none";
+
+  textEl.innerHTML = "BUJJI-GIRL SAVED THE PLANET FROM DR.PANDUGUNDU, SHE SAID YES BUJJI 😭💖";
+  textEl.classList.add("floatText");
+
+  hero.style.display = "block";
+  celebration();
+});
+
+/* Celebration Stars */
+function celebration(){
+  setInterval(()=>{
+    stars.forEach(s=>{
+      s.x += (Math.random()-0.5)*3;
+      s.y += (Math.random()-0.5)*3;
+    });
+  },50);
+}
+</script>
+
+</body>
+</html>
